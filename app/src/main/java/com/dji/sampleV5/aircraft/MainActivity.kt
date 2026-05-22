@@ -1,4 +1,4 @@
-package dji.sampleV5.aircraft
+package com.dji.sampleV5.aircraft
 
 /**
  * Project: sampleV5aircraft
@@ -10,6 +10,7 @@ package dji.sampleV5.aircraft
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.SurfaceHolder
@@ -19,6 +20,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.dji.sampleV5.aircraft.R
 import dji.sdk.keyvalue.value.common.ComponentIndexType
 import dji.v5.common.error.IDJIError
 import dji.v5.common.register.DJISDKInitEvent
@@ -36,7 +38,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var textStatusMonitor: TextView
 
     // Lógica dinámica de permisos para Android 13+ y versiones anteriores
-    private val vitalPermissions = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+    private val vitalPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         arrayOf(
             Manifest.permission.BLUETOOTH,
             Manifest.permission.BLUETOOTH_ADMIN,

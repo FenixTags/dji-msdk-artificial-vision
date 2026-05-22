@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace 'dji.sampleV5.aircraft'
+    namespace 'com.dji.sampleV5.aircraft'
     compileSdk Integer.parseInt(project.ANDROID_COMPILE_SDK_VERSION)
 
     defaultConfig {
-        applicationId "dji.sampleV5.aircraft"
+        applicationId "com.dji.sampleV5.aircraft"
         minSdk Integer.parseInt(project.ANDROID_MIN_SDK_VERSION)
         targetSdk Integer.parseInt(project.ANDROID_TARGET_SDK_VERSION)
         versionCode 1

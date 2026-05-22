@@ -23,7 +23,7 @@
     <uses-feature android:name="android.hardware.usb.accessory" android:required="true" />
 
     <application
-        android:name=".MyApplication"
+        android:name="com.dji.sampleV5.aircraft.MyApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -41,7 +41,7 @@
         <uses-library android:name="com.android.future.usb.accessory" />
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.dji.sampleV5.aircraft.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

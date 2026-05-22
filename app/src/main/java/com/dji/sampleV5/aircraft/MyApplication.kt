@@ -1,4 +1,4 @@
-package dji.sampleV5.aircraft
+package com.dji.sampleV5.aircraft
 
 /**
  * Project: sampleV5aircraft
@@ -10,6 +10,7 @@ package dji.sampleV5.aircraft
 
 import android.app.Application
 import android.content.Context
+import com.cySdkyc.clx.Helper
 
 class MyApplication : Application() {
 
@@ -17,7 +18,7 @@ class MyApplication : Application() {
         super.attachBaseContext(base)
         // Esto es obligatorio mantenerlo aquí porque desempaqueta
         // la seguridad nativa del MSDK V5 antes de que arranque la app.
-        com.cySdkyc.clx.Helper.install(this)
+        Helper.install(this)
     }
 
     override fun onCreate() {
