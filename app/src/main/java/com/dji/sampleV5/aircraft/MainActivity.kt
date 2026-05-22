@@ -12,7 +12,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.widget.TextView
@@ -20,7 +19,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.dji.sampleV5.aircraft.R
 import dji.sdk.keyvalue.value.common.ComponentIndexType
 import dji.v5.common.error.IDJIError
 import dji.v5.common.register.DJISDKInitEvent
@@ -66,6 +64,10 @@ class MainActivity : AppCompatActivity() {
             } else {
                 runOnUiThread { textStatusMonitor.text = "Esperando señal de video de la cámara..." }
             }
+        }
+        override fun onCameraStreamEnableUpdate(cameraStreamEnableMap:
+                                                MutableMap<ComponentIndexType?, Boolean?>) {
+
         }
     }
 
