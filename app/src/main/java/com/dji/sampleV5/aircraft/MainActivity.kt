@@ -22,6 +22,7 @@ import dji.v5.manager.SDKManager
 import dji.v5.manager.datacenter.MediaDataCenter
 import dji.v5.manager.interfaces.ICameraStreamManager
 import dji.v5.manager.interfaces.SDKManagerCallback
+import org.opencv.android.OpenCVLoader
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,6 +32,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var layoutNormalView: View
     private lateinit var layoutFilteredView: View
     private lateinit var textStatusMonitor: TextView
+    private lateinit var textFPSMonitorRaw: TextView
+    private lateinit var textFPSMonitorProc: TextView
 
     // Procesadores Modulares
     private lateinit var rawVideoProcessor: RawVideoProcessor
@@ -95,6 +98,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // INICIALIZACIÓN DE OPENCV
+        if (OpenCVLoader.initLocal()) {
+            Toast.makeText(this, "OpenCV inicializado correctamente", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Error crítico: OpenCV no se cargó", Toast.LENGTH_LONG).show()
+            // Si no carga, no deberías permitir que el usuario cambie al filtro
+        }
+
         // 1. Configurar Toolbar para el menú
         val toolbar = findViewById<Toolbar>(R.id.main_toolbar)
         setSupportActionBar(toolbar)
@@ -103,14 +114,20 @@ class MainActivity : AppCompatActivity() {
         layoutNormalView = findViewById(R.id.layout_normal_view)
         layoutFilteredView = findViewById(R.id.layout_filtered_view)
         textStatusMonitor = findViewById(R.id.text_status_monitor)
+        textFPSMonitorRaw = findViewById(R.id.fpsTextView_raw)
+        textFPSMonitorProc = findViewById(R.id.fpsTextView_opencv)
 
         // 3. Enlazar e instanciar los procesadores con sus vistas internas
         val surfaceVideoStream = findViewById<SurfaceView>(R.id.surface_video_stream)
         rawVideoProcessor = RawVideoProcessor(surfaceVideoStream)
 
+        val ivRawVision = findViewById<ImageView>(R.id.iv_raw_vision)
         val ivFilteredVision = findViewById<ImageView>(R.id.iv_filtered_vision)
-        visionProcessor = VisionProcessor(ivFilteredVision)
-
+        visionProcessor = VisionProcessor(ivRawVision,
+            ivFilteredVision,
+            textFPSMonitorRaw,
+            textFPSMonitorProc
+        )
         // 4. Validar permisos e iniciar
         val missingPermissions = analyzeDeficientPermissions()
         if (missingPermissions.isNotEmpty()) {

@@ -1,13 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
-        android:id="@+id/iv_filtered_vision"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:background="#000000" />
+        android:background="#666666">
+        <ImageView
+            android:id="@+id/iv_raw_vision"
+            android:layout_width="350dp"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:background="#000000"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/fpsTextView_raw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="FPS: 0"
+            android:textColor="#00FF00"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:shadowColor="#000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="3"
+            app:layout_constraintTop_toTopOf="@id/iv_raw_vision"
+            app:layout_constraintStart_toStartOf="@id/iv_raw_vision" />
+
+        <ImageView
+            android:id="@+id/iv_filtered_vision"
+            android:layout_width="350dp"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:background="#000000"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/fpsTextView_opencv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="FPS: 0"
+            android:textColor="#00FF00"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:shadowColor="#000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="3"
+            app:layout_constraintStart_toStartOf="@id/iv_filtered_vision"
+            app:layout_constraintTop_toTopOf="@id/iv_filtered_vision" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </FrameLayout>
