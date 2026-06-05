@@ -7,6 +7,7 @@
 [![MSDK](https://img.shields.io/badge/DJI_MSDK-V5.17.0-blue.svg)](https://developer.dji.com/)
 [![OpenCV](https://img.shields.io/badge/OpenCV-4.12.0-orange.svg)](https://opencv.org/)
 [![GitHub license](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/FenixTags/dji-msdk-artificial-vision/blob/stable/LICENSE)
+
 This Android application identifies lines using the integrated camera of DJI drones. It uses image processing with the OpenCV library implemented in Kotlin. The scope is limited to path identification in controlled conditions.
 
 [Overview](#-overview) • [Features](#-features) • [Supported Drones](#-supported-drones) • [Requirements](#-requirements) • [Installation](#-installation) • [Permissions](#-permissions-androidmanifestxml) • [Usage Flow](#-application-usage-flow) • [Technical Setup](#-technical-configuration--troubleshooting) • [Download](#-download)
