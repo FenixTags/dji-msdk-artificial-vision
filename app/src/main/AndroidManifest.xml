@@ -24,6 +24,7 @@
 
     <application
         android:name="com.dji.sampleV5.aircraft.MyApplication"
+        android:extractNativeLibs="true"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"

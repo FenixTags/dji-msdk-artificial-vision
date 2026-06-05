@@ -2,35 +2,52 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000"
-    tools:context="com.dji.sampleV5.aircraft.MainActivity">
+    android:background="#000000">
 
-    <SurfaceView
-        android:id="@+id/surface_video_stream"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/main_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="#222222"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        android:title="Control DJI"
+        android:titleTextColor="#FFFFFF"
+        app:layout_constraintTop_toTopOf="parent" />
+    <FrameLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/main_toolbar"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <include
+            android:id="@+id/layout_normal_view"
+            layout="@layout/content_view" />
+
+        <include
+            android:id="@+id/layout_filtered_view"
+            layout="@layout/filtered_view"
+            android:visibility="gone" />
+
+    </FrameLayout>
 
     <TextView
         android:id="@+id/text_status_monitor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        android:text="Estado: A la espera de señal de hardware DJI..."
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
+        android:layout_margin="16dp"
+        android:text="Estado: Iniciando..."
+        android:textColor="#00FF00"
         android:textStyle="bold"
         android:shadowColor="#000000"
         android:shadowDx="2"
         android:shadowDy="2"
         android:shadowRadius="4"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
