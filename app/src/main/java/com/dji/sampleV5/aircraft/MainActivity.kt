@@ -1,22 +1,18 @@
 package com.dji.sampleV5.aircraft
 
-/**
- * Project: sampleV5aircraft
- * From: dji.sampleV5.aircraft
- * Created by: FenixTags
- * On 5/21/2026
- * All Rights Reserved 2026
- */
-
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.view.SurfaceHolder
+import android.view.Menu
+import android.view.MenuItem
 import android.view.SurfaceView
+import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import dji.sdk.keyvalue.value.common.ComponentIndexType
@@ -26,14 +22,26 @@ import dji.v5.manager.SDKManager
 import dji.v5.manager.datacenter.MediaDataCenter
 import dji.v5.manager.interfaces.ICameraStreamManager
 import dji.v5.manager.interfaces.SDKManagerCallback
+import org.opencv.android.OpenCVLoader
 
 class MainActivity : AppCompatActivity() {
 
-    private val TAG = "MainControlLogic"
     private val RUNTIME_PERMISSION_REQUEST_CODE = 9999
 
-    private lateinit var surfaceVideoStream: SurfaceView
+    // Vistas de la Interfaz
+    private lateinit var layoutNormalView: View
+    private lateinit var layoutFilteredView: View
     private lateinit var textStatusMonitor: TextView
+    private lateinit var textFPSMonitorRaw: TextView
+    private lateinit var textFPSMonitorProc: TextView
+
+    // Procesadores Modulares
+    private lateinit var rawVideoProcessor: RawVideoProcessor
+    private lateinit var visionProcessor: VisionProcessor
+
+    // Estado del sistema
+    private var isShowingFilteredView = false
+    private var isCameraAvailable = false
 
     // Lógica dinámica de permisos para Android 13+ y versiones anteriores
     private val vitalPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -56,18 +64,33 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
+    // Escucha de disponibilidad de hardware (Cámara del dron)
     private val hardwareCameraListener = object : ICameraStreamManager.AvailableCameraUpdatedListener {
         override fun onAvailableCameraUpdated(availableCameraList: List<ComponentIndexType>) {
-            if (availableCameraList.isNotEmpty()) {
-                runOnUiThread { textStatusMonitor.text = "Módulo Óptico Detectado. Iniciando video..." }
-                routeVideoStreamToGraphicSurface()
-            } else {
-                runOnUiThread { textStatusMonitor.text = "Esperando señal de video de la cámara..." }
+            isCameraAvailable = availableCameraList.isNotEmpty()
+
+            runOnUiThread {
+                if (isCameraAvailable) {
+                    // Arrancamos el procesador que corresponda a la vista activa
+                    if (isShowingFilteredView) {
+                        visionProcessor.startListening()
+                        textStatusMonitor.text = "Módulo: Visión Artificial (Activo)"
+                    } else {
+                        // El post asegura que la vista ya tiene dimensiones antes de inyectar el video
+                        layoutNormalView.post {
+                            rawVideoProcessor.startStream()
+                        }
+                        textStatusMonitor.text = "Módulo: Cámara Raw (Activo)"
+                    }
+                } else {
+                    textStatusMonitor.text = "Esperando señal de video de la cámara..."
+                    stopAllProcessors()
+                }
             }
         }
-        override fun onCameraStreamEnableUpdate(cameraStreamEnableMap:
-                                                MutableMap<ComponentIndexType?, Boolean?>) {
 
+        override fun onCameraStreamEnableUpdate(cameraStreamEnableMap: MutableMap<ComponentIndexType?, Boolean?>) {
+            // No es necesario implementar lógica aquí para este caso de uso
         }
     }
 
@@ -75,22 +98,51 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        surfaceVideoStream = findViewById(R.id.surface_video_stream)
-        textStatusMonitor = findViewById(R.id.text_status_monitor)
+        // INICIALIZACIÓN DE OPENCV
+        if (OpenCVLoader.initLocal()) {
+            Toast.makeText(this, "OpenCV inicializado correctamente", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "Error crítico: OpenCV no se cargó", Toast.LENGTH_LONG).show()
+            // Si no carga, no deberías permitir que el usuario cambie al filtro
+        }
 
+        // 1. Configurar Toolbar para el menú
+        val toolbar = findViewById<Toolbar>(R.id.main_toolbar)
+        setSupportActionBar(toolbar)
+
+        // 2. Enlazar contenedores principales
+        layoutNormalView = findViewById(R.id.layout_normal_view)
+        layoutFilteredView = findViewById(R.id.layout_filtered_view)
+        textStatusMonitor = findViewById(R.id.text_status_monitor)
+        textFPSMonitorRaw = findViewById(R.id.fpsTextView_raw)
+        textFPSMonitorProc = findViewById(R.id.fpsTextView_opencv)
+
+        // 3. Enlazar e instanciar los procesadores con sus vistas internas
+        val surfaceVideoStream = findViewById<SurfaceView>(R.id.surface_video_stream)
+        rawVideoProcessor = RawVideoProcessor(surfaceVideoStream)
+
+        val ivRawVision = findViewById<ImageView>(R.id.iv_raw_vision)
+        val ivFilteredVision = findViewById<ImageView>(R.id.iv_filtered_vision)
+        visionProcessor = VisionProcessor(ivRawVision,
+            ivFilteredVision,
+            textFPSMonitorRaw,
+            textFPSMonitorProc
+        )
+        // 4. Validar permisos e iniciar
         val missingPermissions = analyzeDeficientPermissions()
         if (missingPermissions.isNotEmpty()) {
             ActivityCompat.requestPermissions(this, missingPermissions.toTypedArray(), RUNTIME_PERMISSION_REQUEST_CODE)
         } else {
-            // Los permisos ya fueron otorgados previamente, iniciamos el SDK de forma segura.
             initDJISDK()
         }
     }
 
+    // --- MANEJO DE PERMISOS ---
+
     private fun analyzeDeficientPermissions(): List<String> {
         val deficiencies = mutableListOf<String>()
         for (permission in vitalPermissions) {
-            if (ContextCompat.checkSelfPermission(this, permission)!= PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
                 deficiencies.add(permission)
             }
         }
@@ -99,11 +151,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
         if (requestCode == RUNTIME_PERMISSION_REQUEST_CODE) {
             val pendingDeficiencies = analyzeDeficientPermissions()
             if (pendingDeficiencies.isEmpty()) {
-                // El usuario acaba de aceptar los permisos. Ahora sí, arrancamos el motor.
                 initDJISDK()
             } else {
                 Toast.makeText(this, "Permisos denegados. La app no puede funcionar.", Toast.LENGTH_LONG).show()
@@ -112,11 +162,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /**
-     * Esta función centraliza la inicialización.
-     * Garantiza que primero se valide la App Key y, ÚNICAMENTE si es exitoso,
-     * se intente jalar el video de la cámara.
-     */
+    // --- INICIALIZACIÓN DJI MSDK V5 ---
+
     private fun initDJISDK() {
         textStatusMonitor.text = "Iniciando motor DJI SDK..."
 
@@ -129,15 +176,16 @@ class MainActivity : AppCompatActivity() {
 
             override fun onRegisterSuccess() {
                 runOnUiThread {
-                    textStatusMonitor.text = "SDK Registrado. Esperando a que conectes el control remoto..."
-                    // Habilitamos la cámara solo cuando el SDK es funcional
-                    attachCameraStreamObserver()
+                    textStatusMonitor.text = "SDK Registrado. Esperando conexión del control remoto..."
+                    // Conectamos el listener de la cámara solo cuando el registro es exitoso
+                    MediaDataCenter.getInstance().cameraStreamManager
+                        .addAvailableCameraUpdatedListener(hardwareCameraListener)
                 }
             }
 
             override fun onRegisterFailure(error: IDJIError?) {
                 runOnUiThread {
-                    textStatusMonitor.text = "Error de registro: ${error?.description()}"
+                    textStatusMonitor.text = "Error de registro SDK: ${error?.description()}"
                 }
             }
 
@@ -148,7 +196,10 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onProductDisconnect(productId: Int) {
-                runOnUiThread { textStatusMonitor.text = "Hardware desconectado." }
+                runOnUiThread {
+                    textStatusMonitor.text = "Hardware desconectado."
+                    stopAllProcessors()
+                }
             }
 
             override fun onProductChanged(productId: Int) {}
@@ -156,34 +207,81 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun attachCameraStreamObserver() {
-        MediaDataCenter.getInstance().cameraStreamManager.addAvailableCameraUpdatedListener(hardwareCameraListener)
+    // --- MANEJO DEL MENÚ SUPERIOR ---
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_vistas, menu)
+        return true
     }
 
-    private fun routeVideoStreamToGraphicSurface() {
-        val surfaceHolder: SurfaceHolder = surfaceVideoStream.holder
-        val graphicSurface = surfaceHolder.surface
-
-        if (graphicSurface == null ||!graphicSurface.isValid) return
-
-        val targetWidth = surfaceVideoStream.width
-        val targetHeight = surfaceVideoStream.height
-
-        if (targetWidth <= 0 || targetHeight <= 0) return
-
-        MediaDataCenter.getInstance().cameraStreamManager.putCameraStreamSurface(
-            ComponentIndexType.LEFT_OR_MAIN,
-            graphicSurface,
-            targetWidth,
-            targetHeight,
-            ICameraStreamManager.ScaleType.CENTER_CROP
-        )
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.nav_camara_normal -> {
+                switchToNormalView()
+                true
+            }
+            R.id.nav_camara_filtro -> {
+                switchToFilteredView()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
+
+    // --- LÓGICA DE INTERCAMBIO DE MÓDULOS (SWAP) ---
+
+    private fun switchToNormalView() {
+        if (!isShowingFilteredView) return
+        isShowingFilteredView = false
+
+        // Apagar visión artificial
+        visionProcessor.stopListening()
+
+        // Cambiar visibilidad de interfaces
+        layoutFilteredView.visibility = View.GONE
+        layoutNormalView.visibility = View.VISIBLE
+
+        // Encender hardware raw stream si la cámara está activa
+        if (isCameraAvailable) {
+            layoutNormalView.post { rawVideoProcessor.startStream() }
+            textStatusMonitor.text = "Módulo: Cámara Raw (Activo)"
+        }
+    }
+
+    private fun switchToFilteredView() {
+        if (isShowingFilteredView) return
+        isShowingFilteredView = true
+
+        // Apagar hardware raw stream
+        rawVideoProcessor.stopStream()
+
+        // Cambiar visibilidad de interfaces
+        layoutNormalView.visibility = View.GONE
+        layoutFilteredView.visibility = View.VISIBLE
+
+        // Encender visión artificial si la cámara está activa
+        if (isCameraAvailable) {
+            visionProcessor.startListening()
+            textStatusMonitor.text = "Módulo: Visión Artificial (Activo)"
+        }
+    }
+
+    private fun stopAllProcessors() {
+        rawVideoProcessor.stopStream()
+        visionProcessor.stopListening()
+    }
+
+    // --- LIMPIEZA DE MEMORIA (CICLO DE VIDA) ---
 
     override fun onDestroy() {
         super.onDestroy()
-        val multimediaStreamManager = MediaDataCenter.getInstance().cameraStreamManager
-        multimediaStreamManager.removeCameraStreamSurface(surfaceVideoStream.holder.surface)
-        multimediaStreamManager.removeAvailableCameraUpdatedListener(hardwareCameraListener)
+        try {
+            stopAllProcessors()
+            MediaDataCenter.getInstance().cameraStreamManager
+                .removeAvailableCameraUpdatedListener(hardwareCameraListener)
+        } catch (e: Exception) {
+            // Se ignora de forma segura si el usuario cierra la app
+            // antes de que el motor de DJI se haya inicializado.
+        }
     }
 }
