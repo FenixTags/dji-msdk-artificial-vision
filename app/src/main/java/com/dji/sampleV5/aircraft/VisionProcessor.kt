@@ -8,10 +8,6 @@ package com.dji.sampleV5.aircraft
  * All Rights Reserved 2026
  */
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.ImageFormat
-import android.graphics.Rect
-import android.graphics.YuvImage
 import android.os.Handler
 import android.os.Looper
 import android.widget.ImageView
@@ -21,12 +17,14 @@ import dji.sdk.keyvalue.value.common.ComponentIndexType
 import dji.v5.manager.datacenter.MediaDataCenter
 import dji.v5.manager.interfaces.ICameraStreamManager
 import org.opencv.android.Utils
-import java.io.ByteArrayOutputStream
 import org.opencv.core.Core
 import org.opencv.core.CvType
 import org.opencv.core.Mat
+import org.opencv.core.Point
 import org.opencv.core.Scalar
+import org.opencv.core.Size
 import org.opencv.imgproc.Imgproc
+import org.opencv.core.Rect
 
 /**
  * Clase modular que implementa CameraFrameListener para procesar video.
@@ -91,18 +89,34 @@ class VisionProcessor(private val targetImageViewRaw: ImageView,
         Utils.matToBitmap(rgbaMat, rawBitmap)
 
         // 2. Aplicar tu lógica de filtrado (Visión artificial)
-        val processedBitmap = applyAlgorithm(rawBitmap)
+        //val processedBitmap = applyAlgorithm(rawBitmap)
+        val processedBitmap = colorDetectionCMSS(rawBitmap,
+            Scalar(100.0, 150.0, 0.0),
+            Scalar(140.0, 225.0, 225.0),
+            Pair(width, height), // width x height, ex: 1920x1080
+        )
         yuvMat.release()
         rgbaMat.release()
 
 
         // 3. Empujar el resultado de vuelta a la interfaz gráfica
+        /*
         mainThreadHandler.post {
             targetImageViewRaw.setImageBitmap(rawBitmap)
             targetImageViewProc.setImageBitmap(processedBitmap.bitmap)
             fpsTextRaw.text = "FPS: ${processedBitmap.currentFps}"
-            fpsTextProc.text = "FPS: ${processedBitmap.currentFps} T: ${processedBitmap.filterTimeMs}ms"
+            fpsTextProc.text = "FPS: ${processedBitmap.currentFps} T: ${processedBitmap.filterTimeMs}ms" +
+                    "\n ${processedBitmap.bitmap.width}x${processedBitmap.bitmap.height} px"
         }
+         */
+        mainThreadHandler.post {
+            targetImageViewRaw.setImageBitmap(rawBitmap)
+            targetImageViewProc.setImageBitmap(processedBitmap.bitmap)
+            fpsTextRaw.text = "FPS: ${processedBitmap.currentFps}"
+            fpsTextProc.text = "FPS: ${processedBitmap.currentFps} T: ${processedBitmap.filterTimeMs}ms" +
+                    "\n ${processedBitmap.bitmap.width}x${processedBitmap.bitmap.height} px"
+        }
+
     }
 
     private fun applyAlgorithm(originalBitmap: Bitmap): ResultImage {
@@ -114,6 +128,7 @@ class VisionProcessor(private val targetImageViewRaw: ImageView,
 
         // Inicio del procesamiento de OpenCV
         val filterStartTime = System.currentTimeMillis() // Inicia cronómetro del filtro
+
         val processedMat = Mat(originalMat.size(), originalMat.type(), Scalar(0.0, 0.0, 0.0, 255.0))
 
         // Para filtrar azul convertimos de RGB a HSV
@@ -135,12 +150,11 @@ class VisionProcessor(private val targetImageViewRaw: ImageView,
 
         //Imgproc.cvtColor(originalMat, processedMat, Imgproc.COLOR_RGBA2GRAY)
 
-        val filterTimeMs = System.currentTimeMillis() - filterStartTime // Termina cronómetro
-
         // 3. Convertir de vuelta a Bitmap para mostrar en pantalla
         val processedBitmap = createBitmap(processedMat.cols(), processedMat.rows())
         Utils.matToBitmap(processedMat, processedBitmap)
 
+        val filterTimeMs = System.currentTimeMillis() - filterStartTime // Termina cronómetro
 
         // Lógica de FPS
         frameCount++
@@ -158,5 +172,115 @@ class VisionProcessor(private val targetImageViewRaw: ImageView,
 
         // 4. Actualizar el ImageView en el hilo principal de la interfaz
         return ResultImage(processedBitmap, lastFps, filterTimeMs)
+    }
+
+    private fun colorDetectionCMSS(rgbBitmap: Bitmap,
+                                   lowerColor: Scalar,
+                                   upperColor: Scalar,
+                                   sizeImg: Pair<Int, Int>, // width x height, ex: 1920x1080
+                                   kernelSize: Int = 5): CoordsCMSS{
+
+        // Umbrales colores
+        // azul = Scalar(100.0, 150.0, 0.0), Scalar(140, 225, 225)
+        // rojo = Scalar(165.0, 70.0, 25.0), Scalar(215, 255, 255)
+        // verde = Scalar(0.0, 0.0, 0.0), Scalar(180, 255, 255)
+        // Variables a regresar
+        var xCMSS: Int? = null
+        var yCMSS: Int? = null
+        val maskClean = Mat.zeros(sizeImg.second, sizeImg.first, CvType.CV_8UC1)
+
+        val filterStartTime = System.currentTimeMillis() // Inicia cronómetro del filtro
+
+        val originalMat = Mat()
+        val hsvMat = Mat()
+        Utils.bitmapToMat(rgbBitmap, originalMat)
+
+        // Paso 1. Convertir frame al espacio HSV y guardar en hsv
+        Imgproc.cvtColor(originalMat, originalMat, Imgproc.COLOR_RGBA2RGB)
+        Imgproc.cvtColor(originalMat, hsvMat, Imgproc.COLOR_RGB2HSV)
+
+        // Paso 2. Crear mascara binaria
+        val mask = Mat()
+        Core.inRange(hsvMat, lowerColor, upperColor, mask)
+
+        // Paso 3. Creamos kernel morfologico de tamano nxn
+        val kernelSizeElement = Size(kernelSize.toDouble(), kernelSize.toDouble())
+        val kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT,kernelSizeElement)
+
+        // Paso 4. Aplicamos operacion close
+        val maskClosed = Mat()
+        Imgproc.morphologyEx(mask, maskClosed, Imgproc.MORPH_CLOSE, kernel)
+
+        // Paso 5. Aplicamos operacion open
+        Imgproc.morphologyEx(maskClosed, maskClean, Imgproc.MORPH_OPEN, kernel)
+
+        // Recortamos zona superior de interes
+        val roi = Rect(0, 0,
+            sizeImg.first, (sizeImg.second * (280.0/480.0)).toInt())
+        val maskCropped = Mat(maskClean, roi).clone()
+        maskClean.setTo(Scalar(0.0))
+        maskCropped.copyTo(maskClean.submat(roi))
+
+        // Paso 7. Normalizamos mascara (no necesario)
+        //croppedMask.convertTo(croppedMask, -1, 1.0 / 255.0)
+
+        // Paso 8. Comprobamos que la mascara no esta vacia
+        val maskCleanColor = Mat()
+        Imgproc.cvtColor(maskClean, maskCleanColor, Imgproc.COLOR_GRAY2RGB)
+        val moments = Imgproc.moments(maskClean)
+        val m00 = moments.m00
+        //if (Core.countNonZero(croppedMask) == 0) { // Por countNonZero
+        if (m00 != 0.0) { // Por momentos
+            // Paso 9. Calculamos centro de masa
+            xCMSS = (moments.m10 / m00).toInt()
+            yCMSS = (moments.m01 / m00).toInt()
+
+            // Paso 10. Comprobamos que el centro de masa sea valido (comprobado anteriormente)
+
+            // Paso 11. Pintamos centro de masa en la imagen original
+            val point = Point(xCMSS.toDouble(), yCMSS.toDouble())
+
+            Imgproc.circle(maskCleanColor, point, 5,
+                Scalar(255.0, 0.0, 0.0), 5)
+
+        }
+
+        // Paso 11. Pintamos el centro de la imagen
+        val point = Point((sizeImg.first/2).toDouble(), (sizeImg.second/2).toDouble())
+        Imgproc.circle(maskCleanColor, point, 3,
+            Scalar(0.0, 255.0, 0.0), 2)
+
+
+
+        // Paso 11 (No anadido): Convertir Mat a Bitmap para mostrar en pantalla
+        val bitmapMaskClean = createBitmap(maskCleanColor.cols(), maskCleanColor.rows())
+        Utils.matToBitmap(maskCleanColor, bitmapMaskClean)
+
+        // Limpiamos memoria
+        originalMat.release()
+        hsvMat.release()
+        mask.release()
+        maskClosed.release()
+        kernel.release()
+        maskClosed.release()
+        maskCropped.release()
+        maskClean.release()
+        maskCleanColor.release()
+
+
+        val filterTimeMs = System.currentTimeMillis() - filterStartTime // Termina cronómetro
+
+        // Lógica de FPS
+        frameCount++
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastTime >= 1000) {
+            lastFps = frameCount
+            frameCount = 0
+            lastTime = currentTime
+        }
+
+        return CoordsCMSS(xCMSS, yCMSS, bitmapMaskClean, lastFps, filterTimeMs)
+
+
     }
 }
