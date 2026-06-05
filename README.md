@@ -6,10 +6,11 @@
 [![Kotlin](https://img.shields.io/badge/Language-Kotlin-blue.svg)](https://kotlinlang.org/)
 [![MSDK](https://img.shields.io/badge/DJI_MSDK-V5.17.0-blue.svg)](https://developer.dji.com/)
 [![OpenCV](https://img.shields.io/badge/OpenCV-4.12.0-orange.svg)](https://opencv.org/)
+[![GitHub license](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/FenixTags/dji-msdk-artificial-vision/blob/stable/LICENSE)
 
 This Android application identifies lines using the integrated camera of DJI drones. It uses image processing with the OpenCV library implemented in Kotlin. The scope is limited to path identification in controlled conditions.
 
-[Overview](#-overview) • [Features](#-features) • [Supported Drones](#-supported-drones) • [Installation](#-installation) • [Requirements](#-requirements) • [Permissions](#-permissions-androidmanifestxml) • [Usage Flow](#-application-usage-flow) • [Technical Setup](#-technical-configuration--troubleshooting)
+[Overview](#-overview) • [Features](#-features) • [Supported Drones](#-supported-drones) • [Requirements](#-requirements) • [Installation](#-installation) • [Permissions](#-permissions-androidmanifestxml) • [Usage Flow](#-application-usage-flow) • [Technical Setup](#-technical-configuration--troubleshooting) • [Download](#-download)
 
 ---
 
@@ -43,9 +44,28 @@ This project is a mix of:
 * `Matrice 4D/4TD`
 * `Matrice 400`
 
+## 📋 Requirements
+
+### Prerequisites
+- **Android Studio**: Narwhal | 2025.1.3 or newer.
+- **Android SDK**: API 34 (Android 14+)
+- **Java Runtime**: 1.8
+- **Kotlin**: 1.8.10
+- **MSDK Version**: 5.17.0
+- **Android Gradle Plugin**: 8.7.0
+
+### Physical Devices
+- **Android Hardware**: USB-C data connection port.
+- **Compatible Drone**: (See the [supported drones](#-supported-drones) list above ).
+- **Controller**: DJI RC-N1 or newer.
+- **Minimum RAM**: 6GB.
+- **Storage**: 4GB free space.
+- **CPU**: Snapdragon 8 Gen, Dimensity 9500 or superior.
+
+
 ## 🚀 Installation
 
-All library requirements are implemented in the `\app\build.gradle` file, including OpenCV and DJI MSDK via Maven. You do not need to download external files.
+All library requirements are implemented in the `\app\build.gradle` file, including **OpenCV** and **DJI MSDK** via Maven. You do not need to download external files.
 
 ### 1. Android Studio
 Install Android Studio (latest recommended). Follow the installation guide and try to compile a blank app first.
@@ -65,6 +85,8 @@ You need a Developer Key to use the DJI SDK:
     - **App Name**: `sampleV5aircraft`
     - **Software Platform**: `Android`
     - **Package Name**: `com.dji.sampleV5.aircraft`
+    - **Category** : *as you want.*
+    - **Description** : *as you want.*
 
 ### 4. Create gradle.properties
 In the root of the project (`\`), create a file named `gradle.properties` and paste this content:
@@ -94,37 +116,25 @@ Open Android Studio, click on **Open**, and select the `\sampleV5aircraft` folde
 
 ## 🏗️ Project Structure
 
+When the project is all loaded you should view the project tree in Android view as this example:
+
 ```
 sampleV5aircraft/
 ├── app/
-│    ├── manifest/
-│    ├── kotlin+java/
-│    ├── jniLibs/
-│    └── res/
+|    ├── manifest/...
+|    ├── kotlin+java/...
+|    ├── jniLibs/
+|    └── res/...
 └── Gradle Scripts/
     ├── build.gradle (Project: sampleV5aircraft)
     ├── build.gradle (Module: app)
+    ├── proguard-rules.pro
     ├── gradle.properties
+    ├── gradle-wrapper.properties
+    ├── libs.versions.toml
+    ├── local.properties
     └── settings.gradle
 ```
-
-## 📋 Requirements
-
-### Prerequisites
-- **Android Studio**: Ladybug | 2024.2.1 or newer.
-- **Android SDK**: API 34 (Android 14).
-- **Java Runtime**: 1.8.
-- **Kotlin**: 1.8.10.
-- **MSDK Version**: 5.17.0.
-- **Android Gradle Plugin**: 8.7.0.
-
-### Physical Devices
-- **Android Hardware**: USB-C data connection port.
-- **Compatible Drone**: (See the supported list above).
-- **Controller**: DJI RC-N1 or newer.
-- **Minimum RAM**: 6GB.
-- **Storage**: 4GB free space.
-- **CPU**: Snapdragon 8 Gen, Dimensity 9500 or superior.
 
 ## 🔒 Permissions (AndroidManifest.xml)
 The app declares several permissions necessary for the flight ecosystem:
@@ -176,9 +186,19 @@ To avoid compilation errors, the project must be configured with specific versio
 - **Gradle DSL (Groovy)**: We use **Groovy DSL** (`build.gradle`) instead of Kotlin DSL (`.kts`). This is intentional to maintain full compatibility with the DJI MSDK V5 build system and avoid issues with native library indexing.
 - **Gradle Version**: The project uses **Gradle 8.7** and **AGP 8.7.0**.
 
+## 📲 Download
 
+You can download the latest APK here:
+
+[![Download APK](https://img.shields.io/badge/Download-APK-blue)](https://github.com/FenixTags/dji-msdk-artificial-vision/releases/latest)
+
+## 📜 License
+
+This project is licensed under the [MIT License](./LICENSE).
 <div align="center">
 
-**Built with ❤️ for DJI Academic Development**
 
+**Built with 💜 using Kotlin and OpenCV for Academic Development**
+
+*Last Updated: June 2026*
 </div>
