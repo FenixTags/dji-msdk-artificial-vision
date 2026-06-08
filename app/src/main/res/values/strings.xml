@@ -1,3 +1,26 @@
 <resources>
-    <string name="app_name">sampleV5aircraft</string>
+    <string name="app_name">DJI Aircraft MSDK-OpenCV</string>
+    <string name="description_default_fps_0">FPS: 0</string>
+    <string name="description_fps">FPS: </string>
+    <string name="title_toolbar">DJI Control</string>
+    <string name="message_main_status_monitor">Status: Initializing…</string>
+    <string name="message_default_status_monitor">Status: Waiting for DJI hardware signal…</string>
+    <string name="menu_option_raw">Normal Camera (Raw)</string>
+    <string name="menu_option_filter">Computer Vision (Filter)</string>
+    <string name="message_artificial_vision_active_status_monitor">Module: Computer Vision (Active)</string>
+    <string name="message_raw_active_status_monitor">Module: Raw Camera (Active)</string>
+    <string name="message_waiting_camera_status_monitor">Waiting for camera video signal…</string>
+    <string name="dialog_opencv_initialized">OpenCV initialized successfully</string>
+    <string name="dialog_opencv_error">Critical error: OpenCV failed to load</string>
+    <string name="dialog_denegate_permissions">Permissions denied. The app cannot run.</string>
+    <string name="message_permission_error_status_monitor">Error: Insufficient permissions.</string>
+    <string name="message_dji_engine_status_monitor">Starting DJI SDK engine…</string>
+    <string name="message_sdk_registered_status_monitor">SDK registered. Waiting for remote controller connection…</string>
+    <string name="message_disconnect_status_monitor">Hardware disconnected.</string>
+    <string name="message_connect_status_monitor">Hardware connected. ID: %1$d</string>
+    <string name="message_register_failure_status_monitor">SDK registration error: %1$s</string>
+    <string name="description_current_fps">FPS: %1$d</string>
+    <string name="description_metrics_fps">FPS: %1$d T: %2$dms\n%3$dx%4$d px</string>
+    <string name="description_filtered_image">Filtered Image</string>
+    <string name="description_raw_image">Raw Image</string>
 </resources>

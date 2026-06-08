@@ -4,11 +4,11 @@
 
     <item
         android:id="@+id/nav_camara_normal"
-        android:title="Cámara Normal (Raw)"
+        android:title="@string/menu_option_raw"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/nav_camara_filtro"
-        android:title="Visión Artificial (Filtro)"
+        android:title="@string/menu_option_filter"
         app:showAsAction="never" />
 </menu>

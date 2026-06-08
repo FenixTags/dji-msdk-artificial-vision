@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">DJI Aircraft MSDK-OpenCV</string>
+    <string name="description_default_fps_0">FPS: 0</string>
+    <string name="description_fps">FPS: </string>
+    <string name="title_toolbar">Control DJI</string>
+    <string name="message_main_status_monitor">Estado: Iniciando…</string>
+    <string name="message_default_status_monitor">Estado: A la espera de señal de hardware DJI…</string>
+    <string name="menu_option_raw">Cámara Normal (Raw)</string>
+    <string name="menu_option_filter">Visión Artificial (Filtro)</string>
+    <string name="message_artificial_vision_active_status_monitor">Módulo: Visión Artificial (Activo)</string>
+    <string name="message_raw_active_status_monitor">Módulo: Cámara Raw (Activo)</string>
+    <string name="message_waiting_camera_status_monitor">Esperando señal de video de la cámara…</string>
+    <string name="dialog_opencv_initialized">OpenCV inicializado correctamente</string>
+    <string name="dialog_opencv_error">Error crítico: OpenCV no se cargó</string>
+    <string name="dialog_denegate_permissions">Permisos denegados. La app no puede funcionar.</string>
+    <string name="message_permission_error_status_monitor">Error: Permisos insuficientes.</string>
+    <string name="message_dji_engine_status_monitor">Iniciando motor DJI SDK…</string>
+    <string name="message_sdk_registered_status_monitor">SDK Registrado. Esperando conexión del control remoto…</string>
+    <string name="message_disconnect_status_monitor">Hardware desconectado.</string>
+    <string name="message_connect_status_monitor">Hardware conectado. ID: %1$d</string>
+    <string name="message_register_failure_status_monitor">Error de registro SDK: %1$s</string>
+    <string name="description_current_fps">FPS: %1$d</string>
+    <string name="description_metrics_fps">FPS: %1$d T: %2$dms \n %3$dx%4$d px</string>
+    <string name="description_filtered_image">Imagen filtrada</string>
+    <string name="description_raw_image">Imagen original</string>
+</resources>

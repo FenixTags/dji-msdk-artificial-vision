@@ -1,0 +1,16 @@
+package com.dji.sampleV5.aircraft
+
+import android.graphics.Bitmap
+
+/**
+ * Project: sampleV5aircraft
+ * From: com.dji.sampleV5.aircraft
+ * Created by: FenixTags
+ * On 6/5/2026
+ * All Rights Reserved 2026
+ */
+
+data class CoordsCMSS(val xCMSS: Int?, val yCMSS: Int?,
+                      val bitmap: Bitmap,
+                      val currentFps:Int, val filterTimeMs: Long // Variables de rendimiento
+)

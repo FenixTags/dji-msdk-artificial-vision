@@ -5,20 +5,20 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#000000">
+    android:background="@color/black">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/main_toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="#222222"
+        android:background="@color/mid_gray"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        android:title="Control DJI"
-        android:titleTextColor="#FFFFFF"
+        android:title="@string/title_toolbar"
+        android:titleTextColor="@color/white"
         app:layout_constraintTop_toTopOf="parent" />
     <FrameLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="@dimen/common_padding_none"
+        android:layout_height="@dimen/common_padding_none"
         app:layout_constraintTop_toBottomOf="@id/main_toolbar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -39,14 +39,14 @@
         android:id="@+id/text_status_monitor"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="Estado: Iniciando..."
-        android:textColor="#00FF00"
+        android:layout_margin="@dimen/common_padding_default"
+        android:text="@string/message_main_status_monitor"
+        android:textColor="@color/green"
         android:textStyle="bold"
-        android:shadowColor="#000000"
-        android:shadowDx="2"
-        android:shadowDy="2"
-        android:shadowRadius="4"
+        android:shadowColor="@color/black"
+        android:shadowDx="@integer/shadow_medium_text"
+        android:shadowDy="@integer/shadow_medium_text"
+        android:shadowRadius="@integer/shadow_radio_medium_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 

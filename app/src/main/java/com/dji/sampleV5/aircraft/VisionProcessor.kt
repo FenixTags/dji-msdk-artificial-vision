@@ -34,7 +34,7 @@ class VisionProcessor(private val targetImageViewRaw: ImageView,
                       private val targetImageViewProc: ImageView,
                       private val fpsTextRaw: TextView,
                       private val fpsTextProc: TextView
-                    ) : ICameraStreamManager.CameraFrameListener {
+) : ICameraStreamManager.CameraFrameListener {
 
     // Handler para asegurar que la UI se actualice en el hilo principal
     private val mainThreadHandler = Handler(Looper.getMainLooper())
@@ -110,11 +110,24 @@ class VisionProcessor(private val targetImageViewRaw: ImageView,
         }
          */
         mainThreadHandler.post {
+            // Obtener un Context seguro desde una View
+            val ctx = targetImageViewRaw.context
             targetImageViewRaw.setImageBitmap(rawBitmap)
             targetImageViewProc.setImageBitmap(processedBitmap.bitmap)
-            fpsTextRaw.text = "FPS: ${processedBitmap.currentFps}"
-            fpsTextProc.text = "FPS: ${processedBitmap.currentFps} T: ${processedBitmap.filterTimeMs}ms" +
-                    "\n ${processedBitmap.bitmap.width}x${processedBitmap.bitmap.height} px"
+
+            // Usar getString con placeholders definidos en strings.xml
+            fpsTextRaw.text = ctx.getString(
+                R.string.description_current_fps,
+                processedBitmap.currentFps
+            )
+
+            fpsTextProc.text = ctx.getString(
+                R.string.description_metrics_fps,
+                processedBitmap.currentFps,
+                processedBitmap.filterTimeMs,
+                processedBitmap.bitmap.width,
+                processedBitmap.bitmap.height
+            )
         }
 
     }

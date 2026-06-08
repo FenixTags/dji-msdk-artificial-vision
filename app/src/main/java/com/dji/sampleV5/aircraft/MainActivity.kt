@@ -74,16 +74,19 @@ class MainActivity : AppCompatActivity() {
                     // Arrancamos el procesador que corresponda a la vista activa
                     if (isShowingFilteredView) {
                         visionProcessor.startListening()
-                        textStatusMonitor.text = "Módulo: Visión Artificial (Activo)"
+                        textStatusMonitor.text =
+                            getString(R.string.message_artificial_vision_active_status_monitor)
                     } else {
                         // El post asegura que la vista ya tiene dimensiones antes de inyectar el video
                         layoutNormalView.post {
                             rawVideoProcessor.startStream()
                         }
-                        textStatusMonitor.text = "Módulo: Cámara Raw (Activo)"
+                        textStatusMonitor.text =
+                            getString(R.string.message_raw_active_status_monitor)
                     }
                 } else {
-                    textStatusMonitor.text = "Esperando señal de video de la cámara..."
+                    textStatusMonitor.text =
+                        getString(R.string.message_waiting_camera_status_monitor)
                     stopAllProcessors()
                 }
             }
@@ -100,9 +103,9 @@ class MainActivity : AppCompatActivity() {
 
         // INICIALIZACIÓN DE OPENCV
         if (OpenCVLoader.initLocal()) {
-            Toast.makeText(this, "OpenCV inicializado correctamente", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.dialog_opencv_initialized), Toast.LENGTH_SHORT).show()
         } else {
-            Toast.makeText(this, "Error crítico: OpenCV no se cargó", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.dialog_opencv_error), Toast.LENGTH_LONG).show()
             // Si no carga, no deberías permitir que el usuario cambie al filtro
         }
 
@@ -156,8 +159,9 @@ class MainActivity : AppCompatActivity() {
             if (pendingDeficiencies.isEmpty()) {
                 initDJISDK()
             } else {
-                Toast.makeText(this, "Permisos denegados. La app no puede funcionar.", Toast.LENGTH_LONG).show()
-                textStatusMonitor.text = "Error: Permisos insuficientes."
+                Toast.makeText(this,
+                    getString(R.string.dialog_denegate_permissions), Toast.LENGTH_LONG).show()
+                textStatusMonitor.text = getString(R.string.message_permission_error_status_monitor)
             }
         }
     }
@@ -165,7 +169,7 @@ class MainActivity : AppCompatActivity() {
     // --- INICIALIZACIÓN DJI MSDK V5 ---
 
     private fun initDJISDK() {
-        textStatusMonitor.text = "Iniciando motor DJI SDK..."
+        textStatusMonitor.text = getString(R.string.message_dji_engine_status_monitor)
 
         SDKManager.getInstance().init(this.applicationContext, object : SDKManagerCallback {
             override fun onInitProcess(event: DJISDKInitEvent?, totalProcess: Int) {
@@ -176,7 +180,8 @@ class MainActivity : AppCompatActivity() {
 
             override fun onRegisterSuccess() {
                 runOnUiThread {
-                    textStatusMonitor.text = "SDK Registrado. Esperando conexión del control remoto..."
+                    textStatusMonitor.text =
+                        getString(R.string.message_sdk_registered_status_monitor)
                     // Conectamos el listener de la cámara solo cuando el registro es exitoso
                     MediaDataCenter.getInstance().cameraStreamManager
                         .addAvailableCameraUpdatedListener(hardwareCameraListener)
@@ -185,19 +190,23 @@ class MainActivity : AppCompatActivity() {
 
             override fun onRegisterFailure(error: IDJIError?) {
                 runOnUiThread {
-                    textStatusMonitor.text = "Error de registro SDK: ${error?.description()}"
+                    textStatusMonitor.text = getString(
+                        R.string.message_register_failure_status_monitor,
+                        error?.description()
+                    )
                 }
             }
 
             override fun onProductConnect(productId: Int) {
                 runOnUiThread {
-                    textStatusMonitor.text = "Hardware conectado. ID: $productId"
+                    textStatusMonitor.text =
+                        getString(R.string.message_connect_status_monitor, productId)
                 }
             }
 
             override fun onProductDisconnect(productId: Int) {
                 runOnUiThread {
-                    textStatusMonitor.text = "Hardware desconectado."
+                    textStatusMonitor.text = getString(R.string.message_disconnect_status_monitor)
                     stopAllProcessors()
                 }
             }
@@ -244,7 +253,7 @@ class MainActivity : AppCompatActivity() {
         // Encender hardware raw stream si la cámara está activa
         if (isCameraAvailable) {
             layoutNormalView.post { rawVideoProcessor.startStream() }
-            textStatusMonitor.text = "Módulo: Cámara Raw (Activo)"
+            textStatusMonitor.text = getString(R.string.message_raw_active_status_monitor)
         }
     }
 
@@ -262,7 +271,7 @@ class MainActivity : AppCompatActivity() {
         // Encender visión artificial si la cámara está activa
         if (isCameraAvailable) {
             visionProcessor.startListening()
-            textStatusMonitor.text = "Módulo: Visión Artificial (Activo)"
+            textStatusMonitor.text = getString(R.string.message_artificial_vision_active_status_monitor)
         }
     }
 

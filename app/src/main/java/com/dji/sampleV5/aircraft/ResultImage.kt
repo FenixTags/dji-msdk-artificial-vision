@@ -10,8 +10,3 @@ import android.graphics.Bitmap
  * All Rights Reserved 2026
  */
 data class ResultImage(val bitmap: Bitmap, val currentFps:Int, val filterTimeMs: Long)
-
-data class CoordsCMSS(val xCMSS: Int?, val yCMSS: Int?,
-                      val bitmap: Bitmap,
-                      val currentFps:Int, val filterTimeMs: Long // Variables de rendimiento
-                    )

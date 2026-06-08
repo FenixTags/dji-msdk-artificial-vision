@@ -7,56 +7,62 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#666666">
+        android:background="@color/mid_gray">
         <ImageView
             android:id="@+id/iv_raw_vision"
-            android:layout_width="350dp"
+            android:layout_width="@dimen/common_padding_none"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:background="#000000"
+            android:scaleType="fitCenter"
+            android:background="@color/black"
+            android:contentDescription="@string/description_raw_image"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/iv_filtered_vision"
+            android:layout_margin="@dimen/common_padding_min"/>
 
         <TextView
             android:id="@+id/fpsTextView_raw"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="FPS: 0"
-            android:textColor="#00FF00"
-            android:textSize="20sp"
+            android:text="@string/description_default_fps_0"
+            android:textColor="@color/green"
+            android:textSize="@dimen/description_fps_medium_size"
             android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp"
-            android:shadowColor="#000000"
-            android:shadowDx="2"
-            android:shadowDy="2"
-            android:shadowRadius="3"
+            android:layout_marginTop="@dimen/common_padding_default"
+            android:layout_marginStart="@dimen/common_padding_default"
+            android:shadowColor="@color/black"
+            android:shadowDx="@integer/shadow_medium_text"
+            android:shadowDy="@integer/shadow_medium_text"
+            android:shadowRadius="@integer/shadow_radio_medium_text"
             app:layout_constraintTop_toTopOf="@id/iv_raw_vision"
             app:layout_constraintStart_toStartOf="@id/iv_raw_vision" />
 
         <ImageView
             android:id="@+id/iv_filtered_vision"
-            android:layout_width="350dp"
+            android:layout_width="@dimen/common_padding_none"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:background="#000000"
+            android:scaleType="fitCenter"
+            android:background="@color/black"
+            android:contentDescription="@string/description_filtered_image"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_raw_vision"
+            android:layout_margin="@dimen/common_padding_min"/>
 
         <TextView
             android:id="@+id/fpsTextView_opencv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="FPS: 0"
-            android:textColor="#00FF00"
-            android:textSize="20sp"
+            android:text="@string/description_default_fps_0"
+            android:textColor="@color/green"
+            android:textSize="@dimen/description_fps_medium_size"
             android:textStyle="bold"
-            android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp"
-            android:shadowColor="#000000"
-            android:shadowDx="2"
-            android:shadowDy="2"
-            android:shadowRadius="3"
+            android:layout_marginTop="@dimen/common_padding_default"
+            android:layout_marginStart="@dimen/common_padding_default"
+            android:shadowColor="@color/black"
+            android:shadowDx="@integer/shadow_medium_text"
+            android:shadowDy="@integer/shadow_medium_text"
+            android:shadowRadius="@integer/shadow_radio_medium_text"
             app:layout_constraintStart_toStartOf="@id/iv_filtered_vision"
             app:layout_constraintTop_toTopOf="@id/iv_filtered_vision" />
     </androidx.constraintlayout.widget.ConstraintLayout>

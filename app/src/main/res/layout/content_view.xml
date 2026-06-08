@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#000000"
+    android:background="@color/black"
     tools:context="com.dji.sampleV5.aircraft.MainActivity"
     tools:showIn="@layout/activity_main">
     <!-- Solo considera la vista de alguna fuente en modo desarrollador,
@@ -18,28 +18,14 @@
 
         <SurfaceView
             android:id="@+id/surface_video_stream"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="@dimen/common_padding_none"
+            android:layout_height="@dimen/common_padding_none"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
 
-        <TextView
-            android:id="@+id/text_status_monitor"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="24dp"
-            android:text="Estado: A la espera de señal de hardware DJI..."
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:shadowColor="#000000"
-            android:shadowDx="2"
-            android:shadowDy="2"
-            android:shadowRadius="4"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>
